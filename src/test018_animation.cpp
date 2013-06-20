@@ -4,6 +4,7 @@
 #include "animationset.h"
 #include "animationpack.h"
 #include "animationtemplate.h"
+#include "animationmanager.h"
 #include "klib.h"
 
 /*
@@ -31,6 +32,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
 class MySprite: public ISprite {
 public:
+  MySprite() {
+    LOGD( ">> +1 sprite[%p]\n", this );
+  }
+  virtual ~MySprite() {
+    LOGD( "<< -1 sprite[%p]\n", this );
+  }
   virtual Vec2& GetPositionPtr() {
     return this->_position;
   }

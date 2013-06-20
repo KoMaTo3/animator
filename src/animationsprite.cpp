@@ -46,6 +46,9 @@ AnimationSprite::AnimationSprite( IAnimationObject* sprite )
 
 AnimationSprite::~AnimationSprite() {
   printf( "-AnimationSprite %p\n", this );
+  if( this->_sprite ) {
+    delete this->_sprite;
+  }
 }
 
 
