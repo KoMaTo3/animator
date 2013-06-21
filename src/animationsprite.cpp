@@ -94,6 +94,34 @@ IAnimationParameter* AnimationSprite::SetParameter( AnimationSpriteParameterType
     LOGD( "Binded COLOR\n" );
     break;
     }
+  case TEXTURE_NAME: {
+    AnimationParameterString *value = new AnimationParameterString();
+    parameter = value;
+    value->Bind( &this->_sprite->GetTextureNamePtr() );
+    LOGD( "Binded TEXTURE_NAME\n" );
+    break;
+    }
+  case TEXTURE_COORDINATES: {
+    AnimationParameterFloat4 *value = new AnimationParameterFloat4();
+    parameter = value;
+    value->Bind( this->_sprite->GetTextureCoordsPtr() );
+    LOGD( "Binded TEXTURE_COORDINATES\n" );
+    break;
+    }
+  case ROTATION: {
+    AnimationParameterFloat1 *value = new AnimationParameterFloat1();
+    parameter = value;
+    value->Bind( this->_sprite->GetRotationPtr() );
+    LOGD( "Binded ROTATION\n" );
+    break;
+    }
+  case SCALE: {
+    AnimationParameterFloat2 *value = new AnimationParameterFloat2();
+    parameter = value;
+    value->Bind( this->_sprite->GetScalePtr() );
+    LOGD( "Binded SCALE\n" );
+    break;
+    }
   default:
     LOGE( "Error: AnimationSprite::SetParameter => can't bind parameter x%X\n", parameterType );
   }

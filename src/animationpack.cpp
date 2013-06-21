@@ -109,7 +109,9 @@ void Animation::Update( float dt ) {
 void Animation::Destroy() {
   while( __animationPackActiveList.size() ) {
     ( *__animationPackActiveList.begin() )->SetEnabled( false );
-    //__animationPackActiveList.begin()->second->SetEnabled( false );
+  }
+  while( __animationPackTemplatesList.size() ) {
+    delete __animationPackTemplatesList.begin()->second;
   }
 }//Destroy
 

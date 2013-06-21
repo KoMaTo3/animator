@@ -1,11 +1,14 @@
 #include "stdafx.h"
-#include "animationparameter.h"
-#include "animationsprite.h"
-#include "animationset.h"
-#include "animationpack.h"
-#include "animationtemplate.h"
-#include "animationmanager.h"
+#include "../animationparameter.h"
+#include "../animationsprite.h"
+#include "../animationset.h"
+#include "../animationpack.h"
+#include "../animationtemplate.h"
+#include "../animationmanager.h"
 #include "klib.h"
+#include "file.h"
+#include "tools.h"
+#include "textparser.h"
 
 /*
   Что ещё необходимо сделать:
@@ -14,18 +17,25 @@
   - парсер анимаций из файла
 */
 
+File __log;
 void DoTest();
 void DoTest2();
+void DoTest3();
 
 int _tmain(int argc, _TCHAR* argv[])
 {
   Math::Init();
+  char tmp[ 1024 ];
+  GetModuleFileName( GetModuleHandle( NULL ), tmp, 1024 );
+  std::string path = tools::GetPathFromFilePath( tmp );
+  tools::SetCurDirectory( path.c_str() );
 
   //DoTest();
-  DoTest2();
+  //DoTest2();
+  DoTest3();
 
-  printf( "\n\nDone: " );
   Animation::Destroy();
+  printf( "\n\nDone: " );
 	return 0;
 }
 
@@ -44,13 +54,29 @@ public:
   virtual Vec4& GetColorPtr() {
     return this->_color;
   }
+  virtual std::string& GetTextureNamePtr() {
+    return this->_textureName;
+  }
   virtual IAnimationObject* MakeInstance() {
     return new MySprite();
+  }
+  virtual Vec4& GetTextureCoordsPtr() {
+    return this->_textureCoords;
+  }
+  virtual Vec2& GetScalePtr() {
+    return this->_scale;
+  }
+  virtual float* GetRotationPtr() {
+    return &this->_rotation;
   }
 
 private:
   Vec2 _position;
+  Vec2 _scale;
   Vec4 _color;
+  std::string _textureName;
+  Vec4 _textureCoords;
+  float _rotation;
 };
 
 
@@ -115,6 +141,9 @@ void DoTest2() {
 
   //create animation
   MySprite sprite;
+
+  Animation::Manager mgr;
+  mgr.LoadFile( "test.ani" );
 
   typedef std::shared_ptr< Animation::AnimationPack > AnimationPackPtr;
   typedef std::weak_ptr< Animation::AnimationPack > AnimationPackWeakPtr;
@@ -196,3 +225,16 @@ void DoTest2() {
 
   printf( "\n=== Done ===\n\n" );
 }//DoTest2
+
+void DoTest3() {
+  Animation::Manager mgr;
+  mgr.LoadFile( "test.ani" );
+
+  MySprite sprite;
+  Animation::AnimationPack *pack = sprite.ApplyAnimation( "player/mario", "default" );
+  LOGD( "\nRun...\n" );
+  pack->SetEnabled( true );
+  pack->Reset();
+  pack->Update( 0.5f );
+  pack->__Dump();
+}//DoTest3

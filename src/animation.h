@@ -23,7 +23,11 @@ enum AnimationSpriteParameterType {
   COLOR,
   COLOR_R,
   COLOR_G,
-  COLOR_B
+  COLOR_B,
+  TEXTURE_NAME,
+  TEXTURE_COORDINATES,
+  ROTATION,
+  SCALE
 };
 
 

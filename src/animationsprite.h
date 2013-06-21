@@ -21,6 +21,10 @@ public:
   virtual ~ISprite();
   virtual Vec2& GetPositionPtr() = NULL;
   virtual Vec4& GetColorPtr() = NULL;
+  virtual std::string& GetTextureNamePtr() = NULL;
+  virtual Vec4& GetTextureCoordsPtr() = NULL;
+  virtual Vec2& GetScalePtr() = NULL;
+  virtual float* GetRotationPtr() = NULL;
   virtual IAnimationObject* MakeInstance() = NULL;
 
   Animation::AnimationPack *ApplyAnimation( const std::string& templateName, const std::string& animationName = "default" );
