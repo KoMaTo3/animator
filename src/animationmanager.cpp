@@ -10,6 +10,9 @@ using namespace Animation;
 
 
 Manager::Manager() {
+  this->_loadFunctionList.insert( std::make_pair( "texture", &Manager::_LoadAttributeTexture ) );
+  this->_loadFunctionList.insert( std::make_pair( "scale", &Manager::_LoadAttributeScale ) );
+  this->_loadFunctionList.insert( std::make_pair( "rotation", &Manager::_LoadAttributeRotation ) );
 }
 
 
@@ -177,6 +180,7 @@ void Manager::_LoadAnimationSprite( TextParser &parser, AnimationSet *set ) {
   set->AddAnimation( tpl );
 
   if( !this->_TextParserNextIsSymbol( parser, "{" ) ) {
+    this->_Error( parser, value );
     return;
   }
   
@@ -184,7 +188,72 @@ void Manager::_LoadAnimationSprite( TextParser &parser, AnimationSet *set ) {
   bool isDone = false;
   while( !isDone && parser.GetNext( value ) ) {
     switch( value.type ) {
-    case TPL_STRING:
+    case TPL_STRING: {
+      auto func = this->_loadFunctionList.find( value.value );
+      if( func != this->_loadFunctionList.end() ) {
+        if( !parser.GetNext( value ) || value.type != TPL_SYMBOL ) {
+          this->_Error( parser, value );
+          return;
+        }
+        if( value.value == "(" ) { //one value, without timeline
+          parser.PopLastValue( value );
+          (this->*func->second)( parser, tpl, 0.0f, FLAT );
+        } else if( value.value == "{" ) { //multiple values by time
+          bool isDoneBrackets = false;
+          bool timeSetted = false;
+          bool interpolationSetted = false;
+          float
+            defaultTime = 0.0f,
+            time = defaultTime;
+          InterpolationType
+            defaultInterpolation = FLAT,
+            interpolation = defaultInterpolation;
+          while( !isDoneBrackets && parser.GetNext( value ) ) {
+            switch( value.type ) {
+            case TPL_NUMBER:
+              if( !timeSetted ) {
+                time = value.GetFloat();
+                timeSetted = true;
+              } else {
+                this->_Error( parser, value );
+                return;
+              }
+            break;
+            case TPL_STRING:
+              if( !interpolationSetted ) {
+                interpolation = Interpolation::StringToInterpolation( value.value );
+                interpolationSetted = true;
+              } else {
+                this->_Error( parser, value );
+                return;
+              }
+            break;
+            case TPL_SYMBOL:
+              if( value.value == "(" ) {
+                parser.PopLastValue( value );
+                (this->*func->second)( parser, tpl, time, interpolation );
+                time = defaultTime;
+                interpolation = defaultInterpolation;
+                timeSetted = false;
+                interpolationSetted = false;
+              } else if( value.value == "}" ) {
+                isDoneBrackets = true;
+              } else {
+                this->_Error( parser, value );
+                return;
+              }
+            break;
+            }//switch
+          }//while
+        } else {
+          this->_Error( parser, value );
+          return;
+        }
+      } else {
+        this->_Error( parser, value );
+        return;
+      }
+      /*
       if( value.value == "texture" ) {
         this->_LoadAttributeTexture( parser, tpl );
       } else if( value.value == "rotation" ) {
@@ -194,6 +263,8 @@ void Manager::_LoadAnimationSprite( TextParser &parser, AnimationSet *set ) {
       } else {
         this->_Error( parser, value );
         return;
+      }
+      */
       }
     break;
     case TPL_SYMBOL:
@@ -250,7 +321,7 @@ bool Manager::_TextParserNextIsNumber( TextParser &parser, TextParser::Result &v
 }//_TextParserNextIsNumber
 
 
-void Manager::_LoadAttributeTexture( TextParser &parser, AnimationTemplate *tpl ) {
+void Manager::_LoadAttributeTexture( TextParser &parser, AnimationTemplate *tpl, float time, InterpolationType interpolation ) {
   TextParser::Result value;
   LOGD( "      parameter 'texture'\n" );
 
@@ -315,7 +386,7 @@ void Manager::_LoadAttributeTexture( TextParser &parser, AnimationTemplate *tpl 
         }
         uv.w = value.GetFloat();
         LOGD( "      . texCoords[ %3.3f; %3.3f; %3.3f; %3.3f ]\n", uv.x, uv.y, uv.z, uv.w );
-        static_cast< AnimationParameterFloat4* >( tpl->SetParameter< AnimationParameterFloat4 >( TEXTURE_COORDINATES ) )->AddKeyFrame( 0.0f, uv, FLAT );
+        static_cast< AnimationParameterFloat4* >( tpl->SetParameter< AnimationParameterFloat4 >( TEXTURE_COORDINATES ) )->AddKeyFrame( time, uv, interpolation );
         textureCoordsSetted = true;
       } else {
         this->_Error( parser, value );
@@ -333,7 +404,7 @@ void Manager::_LoadAttributeTexture( TextParser &parser, AnimationTemplate *tpl 
 }//_LoadAttributeTexture
 
 
-void Manager::_LoadAttributeRotation( TextParser &parser, AnimationTemplate *tpl ) {
+void Manager::_LoadAttributeRotation( TextParser &parser, AnimationTemplate *tpl, float time, InterpolationType interpolation ) {
   TextParser::Result value;
   LOGD( "      parameter 'rotation'\n" );
 
@@ -359,7 +430,7 @@ void Manager::_LoadAttributeRotation( TextParser &parser, AnimationTemplate *tpl
       if( !angleSetted ) {
         float angle = value.GetFloat();
         LOGD( "      . angle[ %3.3f ]\n", angle );
-        static_cast< AnimationParameterFloat1* >( tpl->SetParameter< AnimationParameterFloat1 >( ROTATION ) )->AddKeyFrame( 0.0f, angle, FLAT );
+        static_cast< AnimationParameterFloat1* >( tpl->SetParameter< AnimationParameterFloat1 >( ROTATION ) )->AddKeyFrame( time, angle, interpolation );
         angleSetted = true;
       } else {
         this->_Error( parser, value );
@@ -377,7 +448,7 @@ void Manager::_LoadAttributeRotation( TextParser &parser, AnimationTemplate *tpl
 }//_LoadAttributeRotation
 
 
-void Manager::_LoadAttributeScale( TextParser &parser, AnimationTemplate *tpl ) {
+void Manager::_LoadAttributeScale( TextParser &parser, AnimationTemplate *tpl, float time, InterpolationType interpolation ) {
   TextParser::Result value;
   LOGD( "      parameter 'scale'\n" );
 
@@ -425,7 +496,7 @@ void Manager::_LoadAttributeScale( TextParser &parser, AnimationTemplate *tpl ) 
 
   if( scaleSettingStep > 0 ) {
     LOGD( "      . scale[ %3.3f; %3.3f ]\n", scale.x, scale.y );
-    static_cast< AnimationParameterFloat2* >( tpl->SetParameter< AnimationParameterFloat2 >( SCALE ) )->AddKeyFrame( 0.0f, scale, FLAT );
+    static_cast< AnimationParameterFloat2* >( tpl->SetParameter< AnimationParameterFloat2 >( SCALE ) )->AddKeyFrame( time, scale, interpolation );
   }
 
   LOGD( "      parameter done\n" );

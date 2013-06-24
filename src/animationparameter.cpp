@@ -39,8 +39,7 @@ void AnimationParameterFloat1::Update( float animationTime ) {
   }
 
   if( size == 1 ) {
-    *this->_value = this->_keyFrames.begin()->time;
-    LOGW( "[WARNING] float1 update => only one key frame\n" );
+    *this->_value = this->_keyFrames.begin()->value;
     return;
   }
 

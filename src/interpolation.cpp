@@ -10,3 +10,13 @@ float Interpolation::Apply( const float& startValue, const float& endValue, cons
     return startValue;
   }
 }
+
+
+InterpolationType Interpolation::StringToInterpolation( const std::string &str ) {
+  return
+    ( str == "flat" ? FLAT :
+    ( str == "linear" ? LINEAR :
+    UNKNOWN
+    )
+    );
+}//StringToInterpolation

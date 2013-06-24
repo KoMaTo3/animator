@@ -235,6 +235,6 @@ void DoTest3() {
   LOGD( "\nRun...\n" );
   pack->SetEnabled( true );
   pack->Reset();
-  pack->Update( 0.5f );
+  pack->Update( 0.5f * 6.0f );
   pack->__Dump();
 }//DoTest3
