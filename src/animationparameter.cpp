@@ -452,6 +452,7 @@ AnimationParameterString::~AnimationParameterString() {
 
 void AnimationParameterString::Update( float animationTime ) {
   if( !this->_value ) {
+    LOGW( "[WARNING] string update => value is NULL\n" );
     return;
   }
 
@@ -459,14 +460,12 @@ void AnimationParameterString::Update( float animationTime ) {
 
   if( !size ) {
     *this->_value = "";
+    LOGW( "[WARNING] string update => no key frames\n" );
     return;
   }
 
-  KeyFramesList::const_reverse_iterator
-    iterLast = this->_keyFrames.rbegin();
-
   if( size == 1 ) {
-    *this->_value = iterLast->value;
+    *this->_value = this->_keyFrames.begin()->value;
     return;
   }
 
@@ -475,6 +474,8 @@ void AnimationParameterString::Update( float animationTime ) {
     iterEnd = this->_keyFrames.end(),
     iterBegin = this->_keyFrames.begin(),
     iterNext, iterPrev;
+  KeyFramesList::const_reverse_iterator
+    iterLast = this->_keyFrames.rbegin();
 
   if( animationTime < iterBegin->time ) {
     animationTime = iterBegin->time;
@@ -512,7 +513,6 @@ AnimationParameterString* AnimationParameterString::AddKeyFrame( float time, con
 
 
 void AnimationParameterString::__Dump( const std::string &prefix ) {
-  LOGD( "%s. parameter[%p] keyFramesCount[%d] value['%s']\n", prefix.c_str(), this, this->_keyFrames.size(), this->_value->c_str() );
 }//__Dump
 
 

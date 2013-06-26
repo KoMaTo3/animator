@@ -100,6 +100,9 @@ void AnimationPack::SetEnabled( bool setEnabled ) {
 
 
 void Animation::Update( float dt ) {
+  for( auto &pack: __animationPackActiveList ) {
+    pack->Update( dt );
+  }
 }//Update
 
 

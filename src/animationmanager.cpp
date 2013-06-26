@@ -346,7 +346,7 @@ void Manager::_LoadAttributeTexture( TextParser &parser, AnimationTemplate *tpl,
     break;
     case TPL_STRING:  //texture file name
       if( !textureNameSetted ) {
-        static_cast< AnimationParameterString* >( tpl->SetParameter< AnimationParameterString >( TEXTURE_NAME ) )->AddKeyFrame( 0.0f, value.value );
+        static_cast< AnimationParameterString* >( tpl->SetParameter< AnimationParameterString >( TEXTURE_NAME ) )->AddKeyFrame( time, value.value );
         LOGD( "      . textureName['%s']\n", value.value.c_str() );
         textureNameSetted = true;
       } else {
