@@ -33,6 +33,7 @@ public:
   __forceinline void ResetAnimation( float setTime = 0.0f ) {
     this->_time = setTime;
   }
+  void SetEnabled( bool isEnabled );
   void __Dump( const std::string &prefix = "" );
   template< class TAnimation >
   void MakeFromTemplate( const AnimationSet& set, IAnimationObject *object );

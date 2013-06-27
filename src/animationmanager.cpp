@@ -13,6 +13,8 @@ Manager::Manager() {
   this->_loadFunctionList.insert( std::make_pair( "texture", &Manager::_LoadAttributeTexture ) );
   this->_loadFunctionList.insert( std::make_pair( "scale", &Manager::_LoadAttributeScale ) );
   this->_loadFunctionList.insert( std::make_pair( "rotation", &Manager::_LoadAttributeRotation ) );
+  this->_loadFunctionList.insert( std::make_pair( "size", &Manager::_LoadAttributeSize ) );
+  this->_loadFunctionList.insert( std::make_pair( "position", &Manager::_LoadAttributePosition ) );
 }
 
 
@@ -501,3 +503,113 @@ void Manager::_LoadAttributeScale( TextParser &parser, AnimationTemplate *tpl, f
 
   LOGD( "      parameter done\n" );
 }//_LoadAttributeScale
+
+
+void Manager::_LoadAttributeSize( TextParser &parser, AnimationTemplate *tpl, float time, InterpolationType interpolation ) {
+  TextParser::Result value;
+  LOGD( "      parameter 'size'\n" );
+
+  if( !this->_TextParserNextIsSymbol( parser, "(" ) ) {
+    return;
+  }
+
+  bool isDone = false;
+  int sizeSettingStep = 0;
+  Vec2 size( Vec2Null );
+  while( !isDone && parser.GetNext( value ) ) {
+    switch( value.type ) {
+    case TPL_SYMBOL:
+      if( value.value == ")" ) {
+        isDone = true;
+        break;
+      }
+      if( value.value != "," ) {
+        this->_Error( parser, value );
+        return;
+      }
+    break;
+    case TPL_NUMBER:
+      if( sizeSettingStep < 2 ) {
+        switch( sizeSettingStep ) {
+        case 0:
+          size.x = size.y = value.GetFloat();
+        break;
+        case 1:
+          size.y = value.GetFloat();
+        break;
+        }
+        ++sizeSettingStep;
+      } else {
+        this->_Error( parser, value );
+        return;
+      }
+    break;
+    default:
+      this->_Error( parser, value );
+      return;
+    break;
+    }//switch
+  }//while
+
+  if( sizeSettingStep > 0 ) {
+    LOGD( "      . size[ %3.3f; %3.3f ]\n", size.x, size.y );
+    static_cast< AnimationParameterFloat2* >( tpl->SetParameter< AnimationParameterFloat2 >( OBJECT_SIZE ) )->AddKeyFrame( time, size, interpolation );
+  }
+
+  LOGD( "      parameter done\n" );
+}//_LoadAttributeSize
+
+
+void Manager::_LoadAttributePosition( TextParser &parser, AnimationTemplate *tpl, float time, InterpolationType interpolation ) {
+  TextParser::Result value;
+  LOGD( "      parameter 'position'\n" );
+
+  if( !this->_TextParserNextIsSymbol( parser, "(" ) ) {
+    return;
+  }
+
+  bool isDone = false;
+  int positionSettingStep = 0;
+  Vec2 position( Vec2Null );
+  while( !isDone && parser.GetNext( value ) ) {
+    switch( value.type ) {
+    case TPL_SYMBOL:
+      if( value.value == ")" ) {
+        isDone = true;
+        break;
+      }
+      if( value.value != "," ) {
+        this->_Error( parser, value );
+        return;
+      }
+    break;
+    case TPL_NUMBER:
+      if( positionSettingStep < 2 ) {
+        switch( positionSettingStep ) {
+        case 0:
+          position.x = position.y = value.GetFloat();
+        break;
+        case 1:
+          position.y = value.GetFloat();
+        break;
+        }
+        ++positionSettingStep;
+      } else {
+        this->_Error( parser, value );
+        return;
+      }
+    break;
+    default:
+      this->_Error( parser, value );
+      return;
+    break;
+    }//switch
+  }//while
+
+  if( positionSettingStep > 0 ) {
+    LOGD( "      . position[ %3.3f; %3.3f ]\n", position.x, position.y );
+    static_cast< AnimationParameterFloat2* >( tpl->SetParameter< AnimationParameterFloat2 >( POSITION ) )->AddKeyFrame( time, position, interpolation );
+  }
+
+  LOGD( "      parameter done\n" );
+}//_LoadAttributePosition

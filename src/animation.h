@@ -17,6 +17,7 @@
 
 
 enum AnimationSpriteParameterType {
+  ENABLED,
   POSITION,
   POSITION_X,
   POSITION_Y,
@@ -27,7 +28,8 @@ enum AnimationSpriteParameterType {
   TEXTURE_NAME,
   TEXTURE_COORDINATES,
   ROTATION,
-  SCALE
+  SCALE,
+  OBJECT_SIZE
 };
 
 
@@ -45,6 +47,7 @@ public:
   virtual IAnimationParameter* SetParameter( AnimationSpriteParameterType parameterType ) = 0;
   virtual IAnimationObject* MakeObjectInstance() = NULL;
   void Update( float animationTime );
+  void SetEnable( bool isEnabled );
   void __Dump( const std::string &prefix = "" );
   virtual void MakeFromTemplate( const IAnimation &animation ) = NULL;
 

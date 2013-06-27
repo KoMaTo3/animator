@@ -60,8 +60,12 @@ bool AnimationPack::SetCurrentAnimation( const std::string &animationName, float
     LOGW( "[WARNING] AnimationPack::SetCurrentAnimation => this[%p] animation['%s'] not found\n", this, animationName.c_str() );
     return false;
   }
+  for( auto &anim: this->_animationSetList ) {
+    anim.second->SetEnabled( false );
+  }
 
   this->_currentAnimation = &( *animation->second );
+  this->_currentAnimation->SetEnabled( true );
   this->_currentAnimation->ResetAnimation( startTime );
   return true;
 }//SetCurrentAnimation

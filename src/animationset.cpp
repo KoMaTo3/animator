@@ -51,3 +51,10 @@ void AnimationSet::__Dump( const std::string &prefix ) {
     animation->__Dump( prefix + "  " );
   }
 }//__Dump
+
+
+void AnimationSet::SetEnabled( bool isEnabled ) {
+  for( auto &animation: this->_animationList ) {
+    animation->SetEnable( isEnabled );
+  }
+}//DisableAnimation

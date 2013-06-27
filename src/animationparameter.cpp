@@ -441,7 +441,7 @@ void AnimationParameterFloat4::MakeFromTemplate( const IAnimationParameter& para
 * String
 */
 AnimationParameterString::AnimationParameterString()
-:_value( NULL )
+:_value( NULL ), _valueChanged( NULL )
 {
 }
 
@@ -459,8 +459,105 @@ void AnimationParameterString::Update( float animationTime ) {
   int size = this->_keyFrames.size();
 
   if( !size ) {
-    *this->_value = "";
+    this->_SetValue( "" );
     LOGW( "[WARNING] string update => no key frames\n" );
+    return;
+  }
+
+  if( size == 1 ) {
+    this->_SetValue( this->_keyFrames.begin()->value );
+    return;
+  }
+
+  KeyFramesList::const_iterator
+    iter = this->_keyFrames.begin(),
+    iterEnd = this->_keyFrames.end(),
+    iterBegin = this->_keyFrames.begin(),
+    iterNext, iterPrev;
+  KeyFramesList::const_reverse_iterator
+    iterLast = this->_keyFrames.rbegin();
+
+  if( animationTime < iterBegin->time ) {
+    animationTime = iterBegin->time;
+  } else if( animationTime > iterLast->time ) {
+    animationTime = iterLast->time;
+  }
+
+  while( iter != iterEnd ) {
+    if( animationTime < iter->time ) {
+      if( iter == iterBegin ) {
+        iterPrev = iter;
+        iterNext = ++iter;
+      } else {
+        iterNext = iter;
+        iterPrev = --iter;
+      }
+      this->_SetValue( iterPrev->value );
+      return;
+    }
+    ++iter;
+  }//while
+  this->_SetValue( iterLast->value );
+}//Update
+
+
+void AnimationParameterString::Bind( std::string *setValue, bool *onChangeFlag ) {
+  this->_value = setValue;
+  this->_valueChanged = onChangeFlag;
+  this->_valueHash = this->_valueHasher( *this->_value );
+}//Bind
+
+
+AnimationParameterString* AnimationParameterString::AddKeyFrame( float time, const std::string &value ) {
+  this->_keyFrames.push_back( KeyFrameType( time, value, FLAT ) );
+  return this;
+}//AddKeyFrame
+
+
+void AnimationParameterString::__Dump( const std::string &prefix ) {
+  LOGD( "%s. parameter[%p] keyFramesCount[%d] value['%s']\n", prefix.c_str(), this, this->_keyFrames.size(), this->_value->c_str() );
+}//__Dump
+
+
+void AnimationParameterString::MakeFromTemplate( const IAnimationParameter& parameter ) {
+  const AnimationParameterString *param = static_cast< const AnimationParameterString* >( &parameter );
+  for( auto &key: param->_keyFrames ) {
+    this->AddKeyFrame( key.time, key.value );
+  }
+}//MakeFromTemplate
+
+
+void AnimationParameterString::_SetValue( const std::string &newValue ) {
+  *this->_value = newValue;
+  size_t newHash = this->_valueHasher( *this->_value );
+  *this->_valueChanged = ( this->_valueHash != newHash );
+  this->_valueHash = newHash;
+}//_SetValue
+
+
+/*
+* Boolean
+*/
+AnimationParameterBool::AnimationParameterBool()
+:_value( NULL )
+{
+}
+
+
+AnimationParameterBool::~AnimationParameterBool() {
+}
+
+
+void AnimationParameterBool::Update( float animationTime ) {
+  if( !this->_value ) {
+    LOGW( "[WARNING] bool update => value is NULL\n" );
+    return;
+  }
+
+  int size = this->_keyFrames.size();
+
+  if( !size ) {
+    //*this->_value = false;
     return;
   }
 
@@ -501,24 +598,30 @@ void AnimationParameterString::Update( float animationTime ) {
 }//Update
 
 
-void AnimationParameterString::Bind( std::string *setValue ) {
+void AnimationParameterBool::Bind( bool *setValue ) {
   this->_value = setValue;
 }//Bind
 
 
-AnimationParameterString* AnimationParameterString::AddKeyFrame( float time, const std::string &value ) {
+AnimationParameterBool* AnimationParameterBool::AddKeyFrame( float time, bool value ) {
   this->_keyFrames.push_back( KeyFrameType( time, value, FLAT ) );
   return this;
 }//AddKeyFrame
 
 
-void AnimationParameterString::__Dump( const std::string &prefix ) {
+void AnimationParameterBool::__Dump( const std::string &prefix ) {
+  LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%d]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value );
 }//__Dump
 
 
-void AnimationParameterString::MakeFromTemplate( const IAnimationParameter& parameter ) {
-  const AnimationParameterString *param = static_cast< const AnimationParameterString* >( &parameter );
+void AnimationParameterBool::MakeFromTemplate( const IAnimationParameter& parameter ) {
+  const AnimationParameterBool *param = static_cast< const AnimationParameterBool* >( &parameter );
   for( auto &key: param->_keyFrames ) {
     this->AddKeyFrame( key.time, key.value );
   }
 }//MakeFromTemplate
+
+
+void AnimationParameterBool::SetValue( bool newValue ) {
+  *this->_value = newValue;
+}//SetValue

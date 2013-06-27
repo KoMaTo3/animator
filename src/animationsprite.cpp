@@ -37,9 +37,21 @@ Animation::AnimationPack* ISprite::ApplyAnimation( const std::string& templateNa
 }//ApplyAnimation
 
 
+Animation::AnimationPack* ISprite::ApplySubAnimation( const std::string& animationName ) {
+  if( !this->_animation ) {
+    LOGE( "[ERROR] AnimationSprite::ApplySubAnimation => animation '%s' not found\n", animationName.c_str() );
+    return NULL;
+  }
+
+  this->_animation->SetCurrentAnimation( animationName );
+  return this->_animation;
+}//ApplySubAnimation
+
+
 AnimationSprite::AnimationSprite( IAnimationObject* sprite )
 :_sprite( ( ISprite* ) sprite )
 {
+  static_cast< AnimationParameterBool* >( this->SetParameter( ENABLED ) )->Bind( static_cast< ISprite* >( sprite )->GetEnabledPtr() );
   printf( "+AnimationSprite %p\n", this );
 }
 
@@ -97,7 +109,7 @@ IAnimationParameter* AnimationSprite::SetParameter( AnimationSpriteParameterType
   case TEXTURE_NAME: {
     AnimationParameterString *value = new AnimationParameterString();
     parameter = value;
-    value->Bind( &this->_sprite->GetTextureNamePtr() );
+    value->Bind( &this->_sprite->GetTextureNamePtr(), &this->_sprite->GetTextureChangedFlag() );
     LOGD( "Binded TEXTURE_NAME\n" );
     break;
     }
@@ -120,6 +132,20 @@ IAnimationParameter* AnimationSprite::SetParameter( AnimationSpriteParameterType
     parameter = value;
     value->Bind( this->_sprite->GetScalePtr() );
     LOGD( "Binded SCALE\n" );
+    break;
+    }
+  case ENABLED: {
+    AnimationParameterBool *value = new AnimationParameterBool();
+    parameter = value;
+    value->Bind( this->_sprite->GetEnabledPtr() );
+    LOGD( "Binded ENABLED\n" );
+    break;
+    }
+  case OBJECT_SIZE: {
+    AnimationParameterFloat2 *value = new AnimationParameterFloat2();
+    parameter = value;
+    value->Bind( this->_sprite->GetSizePtr() );
+    LOGD( "Binded OBJECT_SIZE\n" );
     break;
     }
   default:

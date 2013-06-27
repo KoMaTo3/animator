@@ -37,3 +37,8 @@ void IAnimation::__Dump( const std::string &prefix ) {
     parameter.second->__Dump( prefix + "  " );
   }
 }//__Dump
+
+
+void IAnimation::SetEnable( bool isEnabled ) {
+  static_cast< AnimationParameterBool* >( &( *this->_parameters.find( ENABLED )->second ) )->SetValue( isEnabled );
+}//Disable

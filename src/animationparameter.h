@@ -142,7 +142,7 @@ public:
   AnimationParameterString();
   virtual ~AnimationParameterString();
   virtual void Update( float animationTime );
-  void Bind( std::string *setValue );
+  void Bind( std::string *setValue, bool *onChangeFlag );
   AnimationParameterString* AddKeyFrame( float time, const std::string &value );
   __forceinline const std::string GetValue() const {
     return ( this->_value ? *this->_value : "" );
@@ -152,7 +152,37 @@ public:
 
 private:
   std::string *_value;
+  bool *_valueChanged;
+  std::hash< std::string > _valueHasher;
+  size_t _valueHash;
   typedef KeyFrame< std::string > KeyFrameType;
+  typedef std::deque< KeyFrameType > KeyFramesList;
+  KeyFramesList _keyFrames;
+
+  void _SetValue( const std::string &newValue );
+};
+
+
+/*
+* bool
+*/
+class AnimationParameterBool: public IAnimationParameter {
+public:
+  AnimationParameterBool();
+  virtual ~AnimationParameterBool();
+  virtual void Update( float animationTime );
+  void Bind( bool *setValue );
+  AnimationParameterBool* AddKeyFrame( float time, bool value );
+  __forceinline bool GetValue() const {
+    return ( this->_value ? *this->_value : false );
+  }
+  virtual void __Dump( const std::string &prefix = "" );
+  virtual void MakeFromTemplate( const IAnimationParameter& parameter );
+  void SetValue( bool newValue );
+
+private:
+  bool *_value;
+  typedef KeyFrame< bool > KeyFrameType;
   typedef std::deque< KeyFrameType > KeyFramesList;
   KeyFramesList _keyFrames;
 };
