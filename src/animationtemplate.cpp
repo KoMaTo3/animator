@@ -1,14 +1,13 @@
 #include "animationtemplate.h"
-#include "logs.h"
 
 
-AnimationTemplate::AnimationTemplate() {
-  printf( "+AnimationTemplate %p\n", this );
+AnimationTemplate::AnimationTemplate( const std::string& setName )
+:IAnimation( setName )
+{
 }
 
 
 AnimationTemplate::~AnimationTemplate() {
-  printf( "-AnimationTemplate %p\n", this );
 }
 
 

@@ -1,9 +1,8 @@
 #include "animationparameter.h"
-#include "logs.h"
+#include "file.h"
 
 
 IAnimationParameter::~IAnimationParameter() {
-  LOGD( "-1 parameter\n" );
 }
 
 
@@ -26,7 +25,7 @@ AnimationParameterFloat1::~AnimationParameterFloat1() {
 
 void AnimationParameterFloat1::Update( float animationTime ) {
   if( !this->_value ) {
-    LOGW( "[WARNING] float1 update => value is NULL\n" );
+    __log.PrintInfo( Filelevel_WARNING, "AnimationParameterFloat1::Update => value is NULL" );
     return;
   }
 
@@ -34,7 +33,7 @@ void AnimationParameterFloat1::Update( float animationTime ) {
 
   if( !size ) {
     *this->_value = 0.0f;
-    LOGW( "[WARNING] float1 update => no key frames\n" );
+    __log.PrintInfo( Filelevel_WARNING, "AnimationParameterFloat1::Update => no key frames" );
     return;
   }
 
@@ -88,7 +87,7 @@ AnimationParameterFloat1* AnimationParameterFloat1::AddKeyFrame( float time, flo
 
 
 void AnimationParameterFloat1::__Dump( const std::string &prefix ) {
-  LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%3.3f]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value );
+  //LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%3.3f]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value );
 }//__Dump
 
 
@@ -194,7 +193,7 @@ AnimationParameterFloat2* AnimationParameterFloat2::AddKeyFrame( float time, con
 
 
 void AnimationParameterFloat2::__Dump( const std::string &prefix ) {
-  LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%3.3f; %3.3f]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value[ 0 ], *this->_value[ 1 ] );
+  //LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%3.3f; %3.3f]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value[ 0 ], *this->_value[ 1 ] );
 }//__Dump
 
 
@@ -236,16 +235,17 @@ void AnimationParameterFloat3::Update( float animationTime ) {
 
   KeyFramesList::const_reverse_iterator
     iterLast = this->_keyFrames.rbegin();
+  KeyFramesList::const_iterator
+    iter = this->_keyFrames.begin();
 
   if( size == 1 ) {
-    *this->_value[ 0 ] = iterLast->value.x;
-    *this->_value[ 1 ] = iterLast->value.y;
-    *this->_value[ 2 ] = iterLast->value.z;
+    *this->_value[ 0 ] = iter->value.x;
+    *this->_value[ 1 ] = iter->value.y;
+    *this->_value[ 2 ] = iter->value.z;
     return;
   }
 
   KeyFramesList::const_iterator
-    iter = this->_keyFrames.begin(),
     iterEnd = this->_keyFrames.end(),
     iterBegin = this->_keyFrames.begin(),
     iterNext, iterPrev;
@@ -306,7 +306,7 @@ AnimationParameterFloat3* AnimationParameterFloat3::AddKeyFrame( float time, con
 
 
 void AnimationParameterFloat3::__Dump( const std::string &prefix ) {
-  LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%3.3f; %3.3f; %3.3f]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value[ 0 ], *this->_value[ 1 ], *this->_value[ 2 ] );
+  //LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%3.3f; %3.3f; %3.3f]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value[ 0 ], *this->_value[ 1 ], *this->_value[ 2 ] );
 }//__Dump
 
 
@@ -350,17 +350,18 @@ void AnimationParameterFloat4::Update( float animationTime ) {
 
   KeyFramesList::const_reverse_iterator
     iterLast = this->_keyFrames.rbegin();
+  KeyFramesList::const_iterator
+    iter = this->_keyFrames.begin();
 
   if( size == 1 ) {
-    *this->_value[ 0 ] = iterLast->value.x;
-    *this->_value[ 1 ] = iterLast->value.y;
-    *this->_value[ 2 ] = iterLast->value.z;
-    *this->_value[ 3 ] = iterLast->value.w;
+    *this->_value[ 0 ] = iter->value.x;
+    *this->_value[ 1 ] = iter->value.y;
+    *this->_value[ 2 ] = iter->value.z;
+    *this->_value[ 3 ] = iter->value.w;
     return;
   }
 
   KeyFramesList::const_iterator
-    iter = this->_keyFrames.begin(),
     iterEnd = this->_keyFrames.end(),
     iterBegin = this->_keyFrames.begin(),
     iterNext, iterPrev;
@@ -425,7 +426,7 @@ AnimationParameterFloat4* AnimationParameterFloat4::AddKeyFrame( float time, con
 
 
 void AnimationParameterFloat4::__Dump( const std::string &prefix ) {
-  LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%3.3f; %3.3f; %3.3f; %3.3f]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value[ 0 ], *this->_value[ 1 ], *this->_value[ 2 ], *this->_value[ 3 ] );
+  //LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%3.3f; %3.3f; %3.3f; %3.3f]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value[ 0 ], *this->_value[ 1 ], *this->_value[ 2 ], *this->_value[ 3 ] );
 }//__Dump
 
 
@@ -452,7 +453,7 @@ AnimationParameterString::~AnimationParameterString() {
 
 void AnimationParameterString::Update( float animationTime ) {
   if( !this->_value ) {
-    LOGW( "[WARNING] string update => value is NULL\n" );
+    __log.PrintInfo( Filelevel_WARNING, "AnimationParameterString::Update => value is NULL" );
     return;
   }
 
@@ -460,7 +461,7 @@ void AnimationParameterString::Update( float animationTime ) {
 
   if( !size ) {
     this->_SetValue( "" );
-    LOGW( "[WARNING] string update => no key frames\n" );
+    __log.PrintInfo( Filelevel_WARNING, "AnimationParameterString::Update => no key frames" );
     return;
   }
 
@@ -515,7 +516,7 @@ AnimationParameterString* AnimationParameterString::AddKeyFrame( float time, con
 
 
 void AnimationParameterString::__Dump( const std::string &prefix ) {
-  LOGD( "%s. parameter[%p] keyFramesCount[%d] value['%s']\n", prefix.c_str(), this, this->_keyFrames.size(), this->_value->c_str() );
+  //LOGD( "%s. parameter[%p] keyFramesCount[%d] value['%s']\n", prefix.c_str(), this, this->_keyFrames.size(), this->_value->c_str() );
 }//__Dump
 
 
@@ -550,14 +551,14 @@ AnimationParameterBool::~AnimationParameterBool() {
 
 void AnimationParameterBool::Update( float animationTime ) {
   if( !this->_value ) {
-    LOGW( "[WARNING] bool update => value is NULL\n" );
+    __log.PrintInfo( Filelevel_WARNING, "AnimationParameterBool::Update => value is NULL" );
     return;
   }
 
   int size = this->_keyFrames.size();
 
   if( !size ) {
-    //*this->_value = false;
+    //__log.PrintInfo( Filelevel_WARNING, "AnimationParameterBool::Update => no keyframes" );
     return;
   }
 
@@ -610,7 +611,7 @@ AnimationParameterBool* AnimationParameterBool::AddKeyFrame( float time, bool va
 
 
 void AnimationParameterBool::__Dump( const std::string &prefix ) {
-  LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%d]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value );
+  //LOGD( "%s. parameter[%p] keyFramesCount[%d] value[%d]\n", prefix.c_str(), this, this->_keyFrames.size(), *this->_value );
 }//__Dump
 
 

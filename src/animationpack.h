@@ -17,6 +17,7 @@ namespace Animation {
 
 
 class AnimationPack;
+class Object;
 
 
 void Update( float dt );
@@ -64,6 +65,7 @@ void AnimationPack::MakeFromTemplate( const Animation::AnimationPack& templatePa
   }
 
   this->SetEnabled( templatePack._isEnabled );
+  this->_name = templatePack._name;
 }//MakeFromTemplate
 
 

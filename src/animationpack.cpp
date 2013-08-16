@@ -1,7 +1,6 @@
 #include "animationpack.h"
 #include "animationset.h"
-#include "animationsprite.h"
-#include "logs.h"
+#include "file.h"
 
 
 #include <deque>
@@ -22,7 +21,6 @@ AnimationPack::AnimationPack( const std::string &animationPackName, bool isTempl
   if( isTemplate ) {
     __animationPackTemplatesList.insert( std::make_pair( animationPackName, this ) );
   }
-  LOGD( "+AnimationPack this[%p] name['%s']\n", this, animationPackName.c_str() );
 }
 
 
@@ -31,7 +29,7 @@ AnimationPack::~AnimationPack() {
   if( this->_isTemplate ) {
     __animationPackTemplatesList.erase( this->_name );
   }
-  LOGD( "-AnimationPack this[%p] name['%s']\n", this, this->_name.c_str() );
+  this->_animationSetList.clear();
 }
 
 
@@ -44,6 +42,7 @@ AnimationSet* AnimationPack::CreateAnimationSet( const std::string& animationNam
 
 
 void AnimationPack::__Dump( const std::string &prefix ) {
+  /*
   LOGD( "%s=> begin AnimationPack: %p\n", prefix.c_str(), this );
   LOGD( "%s   currentAnimation[%p]['%s']\n", prefix.c_str(), this->_currentAnimation, ( this->_currentAnimation ? this->_currentAnimation->GetName().c_str() : "<NULL>" ) );
   LOGD( "%s.  animations sets count: %d\n", prefix.c_str(), this->_animationSetList.size() );
@@ -51,21 +50,28 @@ void AnimationPack::__Dump( const std::string &prefix ) {
     set.second->__Dump( "   " );
   }
   LOGD( "%s=> end AnimationPack: %p\n", prefix.c_str(), this );
+  */
 }
 
 
 bool AnimationPack::SetCurrentAnimation( const std::string &animationName, float startTime ) {
   AnimationSetList::const_iterator animation = this->_animationSetList.find( animationName );
+  //__log.PrintInfo( Filelevel_DEBUG, "AnimationPack::SetCurrentAnimation => animationsCount[%d]", this->_animationSetList.size() );
   if( animation == this->_animationSetList.end() ) {
-    LOGW( "[WARNING] AnimationPack::SetCurrentAnimation => this[%p] animation['%s'] not found\n", this, animationName.c_str() );
+    __log.PrintInfo( Filelevel_WARNING, "AnimationPack::SetCurrentAnimation => this[%p] animation['%s'] not found", this, animationName.c_str() );
     return false;
-  }
-  for( auto &anim: this->_animationSetList ) {
-    anim.second->SetEnabled( false );
   }
 
   this->_currentAnimation = &( *animation->second );
+  for( auto &anim: this->_animationSetList ) {
+    //__log.PrintInfo( Filelevel_DEBUG, "AnimationPack::SetCurrentAnimation => SetEnabled[%p]", anim.second );
+    if( &*anim.second != this->_currentAnimation ) {
+      anim.second->SetEnabled( false );
+    }
+  }
+
   this->_currentAnimation->SetEnabled( true );
+  //__log.PrintInfo( Filelevel_DEBUG, "AnimationPack::SetCurrentAnimation => ResetAnimation[%3.1f] _currentAnimation[%p]", startTime, _currentAnimation );
   this->_currentAnimation->ResetAnimation( startTime );
   return true;
 }//SetCurrentAnimation
@@ -89,18 +95,17 @@ void AnimationPack::SetEnabled( bool setEnabled ) {
   if( this->_isEnabled != setEnabled ) {
     if( setEnabled ) {
       __animationPackActiveList.push_back( this );
-      LOGD( "+1 enabled AnimationPack[%p]\n", this );
     } else {
       //auto iterThis = __animationPackActiveList.find( this->_name );
       auto iterThis = std::find( __animationPackActiveList.begin(), __animationPackActiveList.end(), this );
       if( iterThis != __animationPackActiveList.end() ) {
         __animationPackActiveList.erase( iterThis );
-        LOGD( "-1 enabled AnimationPack[%p]\n", this );
       }
     }
   }
   this->_isEnabled = setEnabled;
 }//SetEnabled
+
 
 
 void Animation::Update( float dt ) {

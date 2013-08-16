@@ -28,8 +28,8 @@ private:
   bool _TextParserNextIsNumber( TextParser &parser, TextParser::Result &value, bool showError = false );
   void _LoadAttributeTexture( TextParser &parser, AnimationTemplate *tpl, float time = 0.0f, InterpolationType interpolation = FLAT );
   void _LoadAttributeRotation( TextParser &parser, AnimationTemplate *tpl, float time = 0.0f, InterpolationType interpolation = FLAT );
-  void _LoadAttributeScale( TextParser &parser, AnimationTemplate *tpl, float time = 0.0f, InterpolationType interpolation = FLAT );
-  void _LoadAttributeSize( TextParser &parser, AnimationTemplate *tpl, float time = 0.0f, InterpolationType interpolation = FLAT );
+  //void _LoadAttributeScale( TextParser &parser, AnimationTemplate *tpl, float time = 0.0f, InterpolationType interpolation = FLAT );
+  //void _LoadAttributeSize( TextParser &parser, AnimationTemplate *tpl, float time = 0.0f, InterpolationType interpolation = FLAT );
   void _LoadAttributePosition( TextParser &parser, AnimationTemplate *tpl, float time = 0.0f, InterpolationType interpolation = FLAT );
 
   typedef void (Manager::*LoadAttributeFunc)( TextParser &parser, AnimationTemplate *tpl, float time, InterpolationType interpolation );

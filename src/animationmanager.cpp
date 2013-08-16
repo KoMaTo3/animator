@@ -11,9 +11,9 @@ using namespace Animation;
 
 Manager::Manager() {
   this->_loadFunctionList.insert( std::make_pair( "texture", &Manager::_LoadAttributeTexture ) );
-  this->_loadFunctionList.insert( std::make_pair( "scale", &Manager::_LoadAttributeScale ) );
+  //this->_loadFunctionList.insert( std::make_pair( "scale", &Manager::_LoadAttributeScale ) );
   this->_loadFunctionList.insert( std::make_pair( "rotation", &Manager::_LoadAttributeRotation ) );
-  this->_loadFunctionList.insert( std::make_pair( "size", &Manager::_LoadAttributeSize ) );
+  //this->_loadFunctionList.insert( std::make_pair( "size", &Manager::_LoadAttributeSize ) );
   this->_loadFunctionList.insert( std::make_pair( "position", &Manager::_LoadAttributePosition ) );
 }
 
@@ -178,7 +178,7 @@ void Manager::_LoadAnimationSprite( TextParser &parser, AnimationSet *set ) {
   }
   const std::string name = value.value;
   LOGD( "    . name['%s']\n", name.c_str() );
-  AnimationTemplate *tpl = new AnimationTemplate();
+  AnimationTemplate *tpl = new AnimationTemplate( name );
   set->AddAnimation( tpl );
 
   if( !this->_TextParserNextIsSymbol( parser, "{" ) ) {
@@ -348,7 +348,7 @@ void Manager::_LoadAttributeTexture( TextParser &parser, AnimationTemplate *tpl,
     break;
     case TPL_STRING:  //texture file name
       if( !textureNameSetted ) {
-        static_cast< AnimationParameterString* >( tpl->SetParameter< AnimationParameterString >( TEXTURE_NAME ) )->AddKeyFrame( time, value.value );
+        static_cast< AnimationParameterString* >( tpl->SetParameter< AnimationParameterString >( RENDERABLE_TEXTURE_NAME ) )->AddKeyFrame( time, value.value );
         LOGD( "      . textureName['%s']\n", value.value.c_str() );
         textureNameSetted = true;
       } else {
@@ -388,7 +388,7 @@ void Manager::_LoadAttributeTexture( TextParser &parser, AnimationTemplate *tpl,
         }
         uv.w = value.GetFloat();
         LOGD( "      . texCoords[ %3.3f; %3.3f; %3.3f; %3.3f ]\n", uv.x, uv.y, uv.z, uv.w );
-        static_cast< AnimationParameterFloat4* >( tpl->SetParameter< AnimationParameterFloat4 >( TEXTURE_COORDINATES ) )->AddKeyFrame( time, uv, interpolation );
+        static_cast< AnimationParameterFloat4* >( tpl->SetParameter< AnimationParameterFloat4 >( RENDERABLE_TEXTURE_COORDINATES ) )->AddKeyFrame( time, uv, interpolation );
         textureCoordsSetted = true;
       } else {
         this->_Error( parser, value );
@@ -432,7 +432,7 @@ void Manager::_LoadAttributeRotation( TextParser &parser, AnimationTemplate *tpl
       if( !angleSetted ) {
         float angle = value.GetFloat();
         LOGD( "      . angle[ %3.3f ]\n", angle );
-        static_cast< AnimationParameterFloat1* >( tpl->SetParameter< AnimationParameterFloat1 >( ROTATION ) )->AddKeyFrame( time, angle, interpolation );
+        static_cast< AnimationParameterFloat1* >( tpl->SetParameter< AnimationParameterFloat1 >( RENDERABLE_ROTATION ) )->AddKeyFrame( time, angle, interpolation );
         angleSetted = true;
       } else {
         this->_Error( parser, value );
@@ -450,6 +450,7 @@ void Manager::_LoadAttributeRotation( TextParser &parser, AnimationTemplate *tpl
 }//_LoadAttributeRotation
 
 
+/*
 void Manager::_LoadAttributeScale( TextParser &parser, AnimationTemplate *tpl, float time, InterpolationType interpolation ) {
   TextParser::Result value;
   LOGD( "      parameter 'scale'\n" );
@@ -503,8 +504,10 @@ void Manager::_LoadAttributeScale( TextParser &parser, AnimationTemplate *tpl, f
 
   LOGD( "      parameter done\n" );
 }//_LoadAttributeScale
+*/
 
 
+/*
 void Manager::_LoadAttributeSize( TextParser &parser, AnimationTemplate *tpl, float time, InterpolationType interpolation ) {
   TextParser::Result value;
   LOGD( "      parameter 'size'\n" );
@@ -558,6 +561,7 @@ void Manager::_LoadAttributeSize( TextParser &parser, AnimationTemplate *tpl, fl
 
   LOGD( "      parameter done\n" );
 }//_LoadAttributeSize
+*/
 
 
 void Manager::_LoadAttributePosition( TextParser &parser, AnimationTemplate *tpl, float time, InterpolationType interpolation ) {

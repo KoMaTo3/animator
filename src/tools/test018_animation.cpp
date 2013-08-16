@@ -9,6 +9,7 @@
 #include "file.h"
 #include "tools.h"
 #include "textparser.h"
+#include "logs.h"
 
 /*
   Что ещё необходимо сделать:
@@ -30,9 +31,9 @@ int _tmain(int argc, _TCHAR* argv[])
   std::string path = tools::GetPathFromFilePath( tmp );
   tools::SetCurDirectory( path.c_str() );
 
-  //DoTest();
-  //DoTest2();
-  DoTest3();
+  DoTest();
+  DoTest2();
+  //DoTest3();
 
   Animation::Destroy();
   printf( "\n\nDone: " );
@@ -57,7 +58,7 @@ public:
   virtual std::string& GetTextureNamePtr() {
     return this->_textureName;
   }
-  virtual IAnimationObject* MakeInstance() {
+  virtual IAnimationObject* MakeInstance( const std::string& setName ) {
     return new MySprite();
   }
   virtual Vec4& GetTextureCoordsPtr() {
@@ -69,6 +70,12 @@ public:
   virtual float* GetRotationPtr() {
     return &this->_rotation;
   }
+  virtual bool* GetEnabledPtr() {
+    return &this->_isEnabled;
+  }
+  virtual bool& GetTextureChangedFlag() {
+    return this->_textureChanged;
+  }
 
 private:
   Vec2 _position;
@@ -77,6 +84,8 @@ private:
   std::string _textureName;
   Vec4 _textureCoords;
   float _rotation;
+  bool _isEnabled;
+  bool _textureChanged;
 };
 
 
@@ -110,7 +119,8 @@ void DoTest() {
 
   std::string str;
   AnimationParameterString paramStr;
-  paramStr.Bind( &str );
+  bool onStrChanged;
+  paramStr.Bind( &str, &onStrChanged );
   paramStr.AddKeyFrame( 0.0f, "test0" );
   paramStr.AddKeyFrame( 1.0f, "test1" );
   paramStr.AddKeyFrame( 2.0f, "test2" );
@@ -157,15 +167,15 @@ void DoTest2() {
 
   //template "enemy/crow/light" => animation "default"
   set = packTpl->CreateAnimationSet( "default", 0.0f );
-  set->AddAnimation( tpl = new AnimationTemplate() ); //1st sprite of animation
+  set->AddAnimation( tpl = new AnimationTemplate( "template0" ) ); //1st sprite of animation
   static_cast< AnimationParameterFloat2* >( tpl->SetParameter< AnimationParameterFloat2 >( POSITION ) )->AddKeyFrame( 0.0f, Vec2( 0.0f, 0.0f ), FLAT );
   static_cast< AnimationParameterFloat4* >( tpl->SetParameter< AnimationParameterFloat4 >( COLOR ) )->AddKeyFrame( 0.0f, Vec4One, FLAT );
-  set->AddAnimation( tpl = new AnimationTemplate() ); //2nd sprite of animation, something effect
+  set->AddAnimation( tpl = new AnimationTemplate( "template1" ) ); //2nd sprite of animation, something effect
   static_cast< AnimationParameterFloat1* >( tpl->SetParameter< AnimationParameterFloat1 >( POSITION_X ) )->AddKeyFrame( 0.0f, 7.0f, FLAT );
 
   //template "enemy/crow/light" => animation "walk"
   set = packTpl->CreateAnimationSet( "walk", 2.0f );
-  set->AddAnimation( tpl = new AnimationTemplate() ); //1st sprite of animation
+  set->AddAnimation( tpl = new AnimationTemplate( "template2" ) ); //1st sprite of animation
   static_cast< AnimationParameterFloat2* >( tpl->SetParameter< AnimationParameterFloat2 >( POSITION ) )
     ->AddKeyFrame( 0.0f, Vec2( 0.0f, 0.0f ), LINEAR )
     ->AddKeyFrame( 1.0f, Vec2( -1.0f, 0.0f ), LINEAR )

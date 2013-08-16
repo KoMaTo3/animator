@@ -1,8 +1,9 @@
 #include "animation.h"
-#include "logs.h"
 
 
-IAnimation::IAnimation() {
+IAnimation::IAnimation( const std::string& setName )
+:_name( setName )
+{
   printf( "+IAnimation %p\n", this );
 }
 
@@ -32,7 +33,6 @@ void IAnimation::Update( float animationTime ) {
 
 
 void IAnimation::__Dump( const std::string &prefix ) {
-  LOGD( "%s. IAnimation[%p] animatedParameters[%d]\n", prefix.c_str(), this, this->_parameters.size() );
   for( auto &parameter: this->_parameters ) {
     parameter.second->__Dump( prefix + "  " );
   }

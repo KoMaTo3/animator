@@ -2,10 +2,7 @@
 #define __ANIMATIONSET_H__
 
 
-#include "logs.h"
-
-
-#include <deque>
+#include <vector>
 #include <memory>
 #include <string>
 
@@ -34,13 +31,17 @@ public:
     this->_time = setTime;
   }
   void SetEnabled( bool isEnabled );
+  bool GetEnabled() const;
   void __Dump( const std::string &prefix = "" );
   template< class TAnimation >
   void MakeFromTemplate( const AnimationSet& set, IAnimationObject *object );
+  inline float GetTime() const {
+    return this->_time;
+  }
 
 private:
   typedef std::shared_ptr< IAnimation > AnimationPtr;
-  typedef std::deque< AnimationPtr > AnimationList;
+  typedef std::vector< AnimationPtr > AnimationList;
   AnimationList _animationList;
   std::string _name;
   float
@@ -55,13 +56,12 @@ private:
 
 template< class TAnimation >
 void AnimationSet::MakeFromTemplate( const AnimationSet& set, IAnimationObject *object ) {
-  LOGD( "AnimationSet %p cloning from %p\n", this, &set );
   this->_name   = set._name;
   this->_time   = set._time;
   this->_animationLength = set._animationLength;
   this->_cycled = set._cycled;
   for( auto &animation: set._animationList ) {
-    TAnimation *anim = new TAnimation( object->MakeInstance() );
+    TAnimation *anim = new TAnimation( object->MakeInstance( animation->GetName() ) );
     this->AddAnimation( anim )->MakeFromTemplate( *animation );
   }
 }//MakeFromTemplate

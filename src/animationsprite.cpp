@@ -49,7 +49,7 @@ Animation::AnimationPack* ISprite::ApplySubAnimation( const std::string& animati
 
 
 AnimationSprite::AnimationSprite( IAnimationObject* sprite )
-:_sprite( ( ISprite* ) sprite )
+:AnimationTemplate( this->GetName() ), _sprite( ( ISprite* ) sprite )
 {
   static_cast< AnimationParameterBool* >( this->SetParameter( ENABLED ) )->Bind( static_cast< ISprite* >( sprite )->GetEnabledPtr() );
   printf( "+AnimationSprite %p\n", this );
@@ -106,27 +106,28 @@ IAnimationParameter* AnimationSprite::SetParameter( AnimationSpriteParameterType
     LOGD( "Binded COLOR\n" );
     break;
     }
-  case TEXTURE_NAME: {
+  case RENDERABLE_TEXTURE_NAME: {
     AnimationParameterString *value = new AnimationParameterString();
     parameter = value;
     value->Bind( &this->_sprite->GetTextureNamePtr(), &this->_sprite->GetTextureChangedFlag() );
     LOGD( "Binded TEXTURE_NAME\n" );
     break;
     }
-  case TEXTURE_COORDINATES: {
+  case RENDERABLE_TEXTURE_COORDINATES: {
     AnimationParameterFloat4 *value = new AnimationParameterFloat4();
     parameter = value;
     value->Bind( this->_sprite->GetTextureCoordsPtr() );
     LOGD( "Binded TEXTURE_COORDINATES\n" );
     break;
     }
-  case ROTATION: {
+  case RENDERABLE_ROTATION: {
     AnimationParameterFloat1 *value = new AnimationParameterFloat1();
     parameter = value;
     value->Bind( this->_sprite->GetRotationPtr() );
     LOGD( "Binded ROTATION\n" );
     break;
     }
+                            /*
   case SCALE: {
     AnimationParameterFloat2 *value = new AnimationParameterFloat2();
     parameter = value;
@@ -134,6 +135,7 @@ IAnimationParameter* AnimationSprite::SetParameter( AnimationSpriteParameterType
     LOGD( "Binded SCALE\n" );
     break;
     }
+    */
   case ENABLED: {
     AnimationParameterBool *value = new AnimationParameterBool();
     parameter = value;
@@ -141,6 +143,7 @@ IAnimationParameter* AnimationSprite::SetParameter( AnimationSpriteParameterType
     LOGD( "Binded ENABLED\n" );
     break;
     }
+                /*
   case OBJECT_SIZE: {
     AnimationParameterFloat2 *value = new AnimationParameterFloat2();
     parameter = value;
@@ -148,6 +151,7 @@ IAnimationParameter* AnimationSprite::SetParameter( AnimationSpriteParameterType
     LOGD( "Binded OBJECT_SIZE\n" );
     break;
     }
+    */
   default:
     LOGE( "Error: AnimationSprite::SetParameter => can't bind parameter x%X\n", parameterType );
   }
@@ -166,7 +170,7 @@ IAnimationParameter* AnimationSprite::SetParameterOfExternAnimation( AnimationSp
 
 
 IAnimationObject* AnimationSprite::MakeObjectInstance() {
-  return this->_sprite->MakeInstance();
+  return this->_sprite->MakeInstance( this->GetName() );
 }//MakeObjectInstance
 
 
